@@ -1,0 +1,81 @@
+export const API_BASE = '/api';
+
+export const API_ENDPOINTS = {
+  AUTH: {
+    LOGIN: '/auth/login',
+    LOGOUT: '/auth/logout',
+    LOGOUT_ALL: '/auth/logout-all',
+    REFRESH: '/auth/refresh',
+    SESSION: '/auth/session',
+    SESSIONS: '/auth/sessions',
+    FORGOT_PASSWORD: '/auth/forgot-password',
+    RESET_PASSWORD: '/auth/reset-password',
+    TWO_FA_SETUP: '/auth/2fa/setup',
+    TWO_FA_ENABLE: '/auth/2fa/enable',
+    TWO_FA_DISABLE: '/auth/2fa/disable',
+    TWO_FA_VERIFY_LOGIN: '/auth/2fa/verify-login',
+  },
+  TASKS: {
+    BASE: '/tasks',
+    DETAIL: (id) => `/tasks/${id}`,
+    SUBTASKS: (id) => `/tasks/${id}/subtasks`,
+    SUBTASK_DETAIL: (taskId, id) => `/tasks/${taskId}/subtasks/${id}`,
+    COMMENTS: (id) => `/tasks/${id}/comments`,
+    DEPENDENCIES: (id) => `/tasks/${id}/dependencies`,
+    DEPENDENCY_DETAIL: (id, depId) => `/tasks/${id}/dependencies/${depId}`,
+    PROOF: (id) => `/tasks/${id}/proof`,
+  },
+  TEAMS: {
+    BASE: '/teams',
+    DETAIL: (id) => `/teams/${id}`,
+  },
+  MEMBERS: {
+    BASE: '/members',
+    DETAIL: (id) => `/members/${id}`,
+    BULK_DELETE: '/members/bulk-delete',
+    TOGGLE_STATUS: (id) => `/members/${id}/status`,
+    CREDENTIALS: (id) => `/members/${id}/credentials`,
+  },
+  ACTIVITIES: {
+    BASE: '/activities',
+  },
+  PROFILE: {
+    BASE: '/profile',
+  },
+  SUPERADMIN: {
+    ADMINS: '/superadmin/admins',
+    ADMIN_DETAIL: (id) => `/superadmin/admins/${id}`,
+    TOGGLE_STATUS: (id) => `/superadmin/admins/${id}/status`,
+    RESET_PASSWORD: (id) => `/superadmin/admins/${id}/reset-password`,
+    USERS: '/superadmin/users',
+    USER_DETAIL: (id) => `/superadmin/users/${id}`,
+    TOGGLE_USER_STATUS: (id) => `/superadmin/users/${id}/status`,
+    RESET_USER_PASSWORD: (id) => `/superadmin/users/${id}/reset-password`,
+    STATS: '/superadmin/stats',
+    OTP_LOGS: '/superadmin/otp/logs',
+    OTP_SEND: '/superadmin/otp/send',
+    AUDIT_LOGS: '/superadmin/audit-logs',
+    SECURITY_AUDIT: '/superadmin/security-audit',
+    LOGIN_HISTORY: '/superadmin/login-history',
+  },
+  NOTIFICATIONS: {
+    BASE: '/notifications',
+    UNREAD_COUNT: '/notifications/unread-count',
+    READ_ALL: '/notifications/read-all',
+    MARK_READ: (id) => `/notifications/${id}/read`,
+  },
+  USER_DASHBOARD: {
+    TASKS: '/user/tasks',
+    STATUS: (id) => `/user/tasks/${id}/status`,
+    STATS: '/user/stats',
+  },
+  QUERIES: {
+    BASE: '/queries',
+    DETAIL: (id) => `/queries/${id}`,
+  },
+  SUPERADMIN_QUERIES: {
+    BASE: '/superadmin/queries',
+    STATS: '/superadmin/queries/stats',
+    DETAIL: (id) => `/superadmin/queries/${id}`,
+  },
+};
