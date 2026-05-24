@@ -94,7 +94,7 @@ Super Admin API: `GET /api/superadmin/security-audit`
 
 After a fresh seed:
 
-- Super Admin: `admin` / `Admin123!`
-- Admin PM: `siddharth` / `Password123!`
+- Super Admin: `` / ``
+- Admin PM: `` / ``
 
 Change these immediately in production.
