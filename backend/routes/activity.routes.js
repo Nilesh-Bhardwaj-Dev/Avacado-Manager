@@ -5,11 +5,15 @@
  */
 import { Router } from 'express';
 import { authenticate } from '../middleware/auth.middleware.js';
+import { optionalTenantContext } from '../middleware/tenant.middleware.js';
 import { getActivities, deleteActivities } from '../controllers/activity.controller.js';
 
 const router = Router();
 
-router.get('/', authenticate, getActivities);
-router.delete('/', authenticate, deleteActivities);
+router.use(authenticate);
+router.use(optionalTenantContext);
+
+router.get('/', getActivities);
+router.delete('/', deleteActivities);
 
 export default router;

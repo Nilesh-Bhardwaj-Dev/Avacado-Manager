@@ -5,6 +5,7 @@ import taskReducer from './slices/task.slice.js';
 import notificationReducer from './slices/notification.slice.js';
 import teamReducer from './slices/team.slice.js';
 import userDashboardReducer from './slices/userDashboard.slice.js';
+import contextReducer from './slices/context.slice.js';
 import rootSaga from './sagas/root.saga.js';
 
 const sagaMiddleware = createSagaMiddleware();
@@ -15,7 +16,8 @@ export const store = configureStore({
     task: taskReducer,
     notification: notificationReducer,
     team: teamReducer,
-    userDashboard: userDashboardReducer
+    userDashboard: userDashboardReducer,
+    context: contextReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

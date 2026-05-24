@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Plus, Trash2, Shield, X, Key, UserCheck } from 'lucide-react';
+import { Plus, Trash2, Shield, X, Key } from 'lucide-react';
 import {
   toggleMemberSelection,
   setSelectedMemberIds,
@@ -19,6 +19,9 @@ export default function MemberManagement() {
   const showMemberModal = useSelector(state => state.team.showMemberModal);
   const deleteConfirmation = useSelector(state => state.team.deleteConfirmation);
   const tasks = useSelector(state => state.task.tasks);
+  const user = useSelector(state => state.auth.user);
+  const permissions = useSelector(state => state.context.permissions || []);
+  const isOrgAdmin = permissions.includes('manage_organization') || user?.accountRole === 'superadmin';
   
   const dispatch = useDispatch();
 
@@ -49,9 +52,10 @@ export default function MemberManagement() {
     const email = formData.get('email').trim();
     const team = formData.get('team');
     const role = formData.get('role').trim();
+    const roleKey = formData.get('roleKey');
 
     dispatch(createMemberRequest({
-      data: { name, email, team, role },
+      data: { name, email, team, role, roleKey },
       onSuccess: () => dispatch(setShowMemberModal(false))
     }));
   };
@@ -201,13 +205,10 @@ export default function MemberManagement() {
                         <Key size={12} />
                       </button>
                       <button
-                        className="btn btn-secondary btn-sm"
-                        style={{ padding: '4px 8px', fontSize: '0.75rem' }}
+                        className={`toggle-switch ${member.status === 'active' || !member.status ? 'active' : ''}`}
                         onClick={() => dispatch(toggleMemberStatusRequest(member.id))}
-                        title="Toggle Member Access Status"
-                      >
-                        <UserCheck size={12} />
-                      </button>
+                        title={member.status === 'active' || !member.status ? 'Deactivate Member' : 'Activate Member'}
+                      />
                       <button
                         className="btn btn-secondary btn-sm"
                         onClick={() => handleRemoveMember(member)}
@@ -267,7 +268,7 @@ export default function MemberManagement() {
                     </select>
                   </div>
                   <div className="form-group">
-                    <label className="form-label">Role</label>
+                    <label className="form-label">Job Title</label>
                     <input
                       type="text"
                       name="role"
@@ -276,6 +277,22 @@ export default function MemberManagement() {
                       required
                     />
                   </div>
+                </div>
+
+                <div className="form-group" style={{ marginTop: '16px' }}>
+                  <label className="form-label">System Role (Permissions)</label>
+                  <select name="roleKey" className="form-control" required defaultValue="developer">
+                    {isOrgAdmin && (
+                      <>
+                        <option value="org_admin">Organization Admin (Full Access)</option>
+                        <option value="project_manager">Product Manager</option>
+                      </>
+                    )}
+                    <option value="team_lead">Team Lead</option>
+                    <option value="developer">Developer</option>
+                    <option value="qa_engineer">QA Engineer</option>
+                    <option value="viewer">Viewer</option>
+                  </select>
                 </div>
 
                 <div style={{

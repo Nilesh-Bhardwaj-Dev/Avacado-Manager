@@ -22,6 +22,7 @@ import notificationRoutes from './routes/notification.routes.js';
 import dependencyRoutes from './routes/dependency.routes.js';
 import userDashboardRoutes from './routes/user-dashboard.routes.js';
 import queryRoutes from './routes/query.routes.js';
+import organizationRoutes from './routes/organization.routes.js';
 
 import { errorHandler } from './middleware/error.middleware.js';
 import { sanitizeInputs } from './middleware/sanitize.middleware.js';
@@ -67,6 +68,7 @@ app.use('/api', (req, res, next) => {
     '/auth/forgot-password',
     '/auth/reset-password',
     '/auth/2fa/verify-login',
+    '/auth/verify-email',
   ];
   const path = req.path.replace(/\/$/, '');
   if (publicPaths.some((p) => path === p || path.endsWith(p))) {
@@ -89,6 +91,7 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/tasks', dependencyRoutes);
 app.use('/api/user', userDashboardRoutes);
 app.use('/api/queries', queryRoutes);
+app.use('/api/organizations', organizationRoutes);
 
 const distPath = path.join(__dirname, '..', 'dist');
 

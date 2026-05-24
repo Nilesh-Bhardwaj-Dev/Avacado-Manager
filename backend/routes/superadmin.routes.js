@@ -1,8 +1,6 @@
 /**
  * @file superadmin.routes.js
  * @description Route definitions for Super Admin management endpoints.
- * All routes are protected by authentication + superadmin role check.
- *
  * Mounted at: /api/superadmin
  */
 import { Router } from 'express';
@@ -13,12 +11,16 @@ import {
   listAdmins,
   createAdmin,
   updateAdmin,
+  updateAdminPermissions,
   deleteAdmin,
   listAllUsers,
   resetPassword,
   toggleStatus,
   getAuditLogs,
   clearAuditLogs,
+  listOrganizations,
+  listOrganizationUsers,
+  toggleOrganizationStatus,
 } from '../controllers/superadmin.controller.js';
 import { listOtpLogs, sendOtp } from '../controllers/otp.controller.js';
 import {
@@ -44,32 +46,38 @@ router.get('/admins', ...guard, listAdmins);
 router.post('/admins', ...guard, createAdmin);
 router.put('/admins/:id/reset-password', ...guard, resetPassword);
 router.put('/admins/:id/status', ...guard, toggleStatus);
+router.put('/admins/:id/permissions', ...guard, updateAdminPermissions);
 router.put('/admins/:id', ...guard, updateAdmin);
 router.delete('/admins/:id', ...guard, deleteAdmin);
 
-// User listing (all users across all admins)
+// User listing (all users across all orgs)
 router.get('/users', ...guard, listAllUsers);
 router.put('/users/:id/reset-password', ...guard, resetPassword);
 router.put('/users/:id/status', ...guard, toggleStatus);
+
+// Organizations management
+router.get('/organizations', ...guard, listOrganizations);
+router.get('/organizations/:orgId/users', ...guard, listOrganizationUsers);
+router.put('/organizations/:orgId/status', ...guard, toggleOrganizationStatus);
 
 // Legacy flat paths (kept for backward compatibility)
 router.put('/reset-password/:id', ...guard, resetPassword);
 router.put('/toggle-status/:id', ...guard, toggleStatus);
 
-// OTP management (super admin only)
+// OTP management
 router.get('/otp/logs', ...guard, listOtpLogs);
 router.post('/otp/send', ...guard, sendOtp);
 
-// Query management (super admin only)
+// Query management
 router.get('/queries/stats', ...guard, getQueryStats);
 router.get('/queries', ...guard, listAllQueries);
 router.put('/queries/:id', ...guard, updateQuery);
 
-// Workspace activity audit (legacy feed)
+// Workspace activity audit
 router.get('/audit-logs', ...guard, getAuditLogs);
 router.delete('/audit-logs', ...guard, clearAuditLogs);
 
-// Security audit logs (auth events)
+// Security audit logs
 router.get('/security-audit', ...guard, listSecurityAuditLogs);
 router.get('/login-history', ...guard, listLoginHistory);
 

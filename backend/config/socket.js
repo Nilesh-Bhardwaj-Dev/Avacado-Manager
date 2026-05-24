@@ -54,7 +54,7 @@ export function initSocket(httpServer) {
 
       socket.user = sanitizeUser(user);
       next();
-    } catch (err) {
+    } catch {
       next(new Error('Authentication failed'));
     }
   });

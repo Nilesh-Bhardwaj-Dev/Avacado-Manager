@@ -30,6 +30,7 @@ import {
   resetPasswordFailure,
 } from '../slices/auth.slice.js';
 import { addToast } from '../slices/notification.slice.js';
+import { clearContext } from '../slices/context.slice.js';
 
 function* loginSaga(action) {
   try {
@@ -78,6 +79,7 @@ function* logoutSaga() {
   } catch {
     // Session may already be cleared
   } finally {
+    yield put(clearContext());
     yield put(logoutSuccess());
   }
 }

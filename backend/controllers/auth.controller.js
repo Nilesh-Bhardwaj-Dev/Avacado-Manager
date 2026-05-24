@@ -140,4 +140,30 @@ export async function listSessions(req, res, next) {
   }
 }
 
+export async function verifyEmail(req, res, next) {
+  try {
+    const { verifyEmailToken } = await import('../services/emailVerification.service.js');
+    const user = await verifyEmailToken(req.body.token);
+    res.json({ success: true, message: 'Email verified successfully.', user: sanitizeUser(user) });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function resendVerification(req, res, next) {
+  try {
+    const { sendVerificationEmail } = await import('../services/emailVerification.service.js');
+    const db = getDB();
+    const user = await db.collection(Collections.USERS).findOne({ id: req.user.id });
+    if (!user) return res.status(404).json({ error: 'User not found.' });
+    if (user.emailVerified) {
+      return res.json({ success: true, message: 'Email is already verified.' });
+    }
+    await sendVerificationEmail(user);
+    res.json({ success: true, message: 'Verification email sent.' });
+  } catch (err) {
+    next(err);
+  }
+}
+
 export { optionalAuthenticate };

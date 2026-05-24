@@ -3,6 +3,7 @@ import { Search, Plus, Bell } from 'lucide-react';
 import { setSearchQuery, setFilterTeam, setFilterPriority, setEditingTask } from '../../store/slices/task.slice.js';
 import { setShowNotifPanel } from '../../store/slices/notification.slice.js';
 import NotificationDropdown from './NotificationDropdown.jsx';
+import Can from '../Common/Can.jsx';
 
 export default function Header() {
   const searchQuery = useSelector(state => state.task.searchQuery);
@@ -48,10 +49,12 @@ export default function Header() {
           <option value="low">Low</option>
         </select>
 
-        <button className="btn btn-primary" onClick={() => dispatch(setEditingTask(true))}>
-          <Plus size={18} />
-          Create Task
-        </button>
+        <Can permission="create_task">
+          <button className="btn btn-primary" onClick={() => dispatch(setEditingTask(true))}>
+            <Plus size={18} />
+            Create Task
+          </button>
+        </Can>
 
         <div style={{ position: 'relative' }}>
           <button 

@@ -9,7 +9,7 @@ import { getDB } from '../config/db.js';
  * Inserts a new activity record into the activities collection.
  * @param {string} text - Human-readable description of the action.
  */
-export async function logActivity(text, ownerId = null) {
+export async function logActivity(text, ownerId = null, organizationId = null) {
   const db = getDB();
   await db.collection('activities').insertOne({
     id: 'act-' + Date.now(),
@@ -17,5 +17,6 @@ export async function logActivity(text, ownerId = null) {
     timestamp: 'Just now',
     createdAt: new Date(),
     ownerId,
+    organizationId,
   });
 }

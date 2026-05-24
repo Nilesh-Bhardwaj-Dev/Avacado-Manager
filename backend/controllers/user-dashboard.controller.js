@@ -4,6 +4,7 @@
  */
 import { getDB } from '../config/db.js';
 import { sendNotification } from '../utils/notification.util.js';
+import { resolveTaskScope } from '../utils/taskScope.util.js';
 
 /**
  * GET /api/user/tasks — returns tasks assigned to the current user
@@ -11,8 +12,10 @@ import { sendNotification } from '../utils/notification.util.js';
 export async function getMyTasks(req, res, next) {
   try {
     const db = getDB();
+    const scope = await resolveTaskScope(req);
+    const query = { ...scope.query, assigneeId: req.user.id };
     const tasks = await db.collection('tasks')
-      .find({ assigneeId: req.user.id, ownerId: req.user.managedBy })
+      .find(query)
       .sort({ createdAt: -1 })
       .toArray();
     res.json(tasks);
@@ -35,11 +38,12 @@ export async function updateMyTaskStatus(req, res, next) {
       return res.status(400).json({ error: 'Invalid status' });
     }
 
+    const scope = await resolveTaskScope(req);
     // Verify task is assigned to this user
     const task = await db.collection('tasks').findOne({
+      ...scope.query,
       id: taskId,
-      assigneeId: req.user.id,
-      ownerId: req.user.managedBy
+      assigneeId: req.user.id
     });
 
     if (!task) {
@@ -71,21 +75,22 @@ export async function updateMyTaskStatus(req, res, next) {
 
     // If task completed, notify admin and check dependent tasks
     if (status === 'done') {
+      const ownerId = scope.ownerId;
       // Notify admin
-      if (req.user.managedBy) {
+      if (ownerId) {
         await sendNotification({
           type: 'TASK_COMPLETED',
-          recipientId: req.user.managedBy,
+          recipientId: ownerId,
           title: 'Task Completed',
           message: `${req.user.name} completed "${task.title}"`,
           taskId: task.id,
-          ownerId: req.user.managedBy
+          ownerId
         });
       }
 
       // Check for unblocked dependent tasks
       const dependentTasks = await db.collection('tasks')
-        .find({ dependencies: taskId, ownerId: req.user.managedBy })
+        .find({ ...scope.query, dependencies: taskId })
         .toArray();
 
       for (const depTask of dependentTasks) {
@@ -102,7 +107,7 @@ export async function updateMyTaskStatus(req, res, next) {
             title: 'Task Unblocked',
             message: `"${depTask.title}" is no longer blocked — all dependencies are complete`,
             taskId: depTask.id,
-            ownerId: req.user.managedBy
+            ownerId: ownerId || req.user.id
           });
         }
       }
@@ -120,8 +125,9 @@ export async function updateMyTaskStatus(req, res, next) {
 export async function getMyStats(req, res, next) {
   try {
     const db = getDB();
+    const scope = await resolveTaskScope(req);
     const pipeline = [
-      { $match: { assigneeId: req.user.id, ownerId: req.user.managedBy } },
+      { $match: { ...scope.query, assigneeId: req.user.id } },
       { $group: { _id: '$status', count: { $sum: 1 } } }
     ];
     const results = await db.collection('tasks').aggregate(pipeline).toArray();
@@ -137,8 +143,8 @@ export async function getMyStats(req, res, next) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const overdue = await db.collection('tasks').countDocuments({
+      ...scope.query,
       assigneeId: req.user.id,
-      ownerId: req.user.managedBy,
       status: { $ne: 'done' },
       dueDate: { $lt: today.toISOString().split('T')[0] }
     });

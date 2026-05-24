@@ -12,10 +12,6 @@ import { hashPassword, verifyPassword } from './password.service.js';
 
 const BACKUP_CODE_COUNT = 10;
 
-function hashBackupCode(code) {
-  return crypto.createHash('sha256').update(code).digest('hex');
-}
-
 /**
  * @param {object} user
  * @returns {Promise<{ secret: string, otpauthUrl: string, qrCodeDataUrl: string }>}

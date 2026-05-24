@@ -13,8 +13,13 @@ import { logActivity } from '../utils/activity.util.js';
 export async function getActivities(req, res, next) {
   try {
     const db = getDB();
-    const ownerId = req.user.accountRole === 'admin' ? req.user.id : (req.user.accountRole === 'user' ? req.user.managedBy : null);
-    const query = ownerId ? { ownerId } : {};
+    let query = {};
+    if (req.context?.organizationId) {
+      query.organizationId = req.context.organizationId;
+    } else {
+      const ownerId = req.user.accountRole === 'admin' ? req.user.id : (req.user.accountRole === 'user' ? req.user.managedBy : null);
+      if (ownerId) query.ownerId = ownerId;
+    }
     const activities = await db
       .collection('activities')
       .find(query)
@@ -36,9 +41,16 @@ export async function deleteActivities(req, res, next) {
   try {
     const { range } = req.query;
     const db = getDB();
-    const ownerId = req.user.accountRole === 'admin' ? req.user.id : req.user.managedBy;
+    let query = {};
+    let ownerId = null;
 
-    let query = { ownerId };
+    if (req.context?.organizationId) {
+      query.organizationId = req.context.organizationId;
+    } else {
+      ownerId = req.user.accountRole === 'admin' ? req.user.id : req.user.managedBy;
+      if (ownerId) query.ownerId = ownerId;
+    }
+
     const now = new Date();
 
     if (range === 'last-week') {
@@ -48,7 +60,7 @@ export async function deleteActivities(req, res, next) {
       const cutoff = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
       query.createdAt = { $gte: cutoff };
     } else if (range === 'all') {
-      // query already contains ownerId
+      // query ready
     } else {
       return res.status(400).json({ error: "Invalid range parameter. Use 'all', 'last-week', or 'last-month'." });
     }
@@ -56,7 +68,7 @@ export async function deleteActivities(req, res, next) {
     const result = await db.collection('activities').deleteMany(query);
 
     // Log this action to the activity feed
-    await logActivity(`${req.user.name} cleared activities (range: ${range})`, ownerId);
+    await logActivity(`${req.user.name} cleared activities (range: ${range})`, ownerId, req.context?.organizationId || null);
 
     res.json({ success: true, deletedCount: result.deletedCount });
   } catch (err) {

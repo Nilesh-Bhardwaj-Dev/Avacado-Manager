@@ -45,6 +45,7 @@ export const API_ENDPOINTS = {
   SUPERADMIN: {
     ADMINS: '/superadmin/admins',
     ADMIN_DETAIL: (id) => `/superadmin/admins/${id}`,
+    ADMIN_PERMISSIONS: (id) => `/superadmin/admins/${id}/permissions`,
     TOGGLE_STATUS: (id) => `/superadmin/admins/${id}/status`,
     RESET_PASSWORD: (id) => `/superadmin/admins/${id}/reset-password`,
     USERS: '/superadmin/users',
@@ -57,6 +58,9 @@ export const API_ENDPOINTS = {
     AUDIT_LOGS: '/superadmin/audit-logs',
     SECURITY_AUDIT: '/superadmin/security-audit',
     LOGIN_HISTORY: '/superadmin/login-history',
+    ORGANIZATIONS: '/superadmin/organizations',
+    ORG_USERS: (orgId) => `/superadmin/organizations/${orgId}/users`,
+    ORG_STATUS: (orgId) => `/superadmin/organizations/${orgId}/status`,
   },
   NOTIFICATIONS: {
     BASE: '/notifications',
@@ -78,4 +82,18 @@ export const API_ENDPOINTS = {
     STATS: '/superadmin/queries/stats',
     DETAIL: (id) => `/superadmin/queries/${id}`,
   },
+  ORGANIZATIONS: {
+    BASE: '/organizations',
+    DETAIL: (orgId) => `/organizations/${orgId}`,
+    PERMISSIONS: (orgId) => `/organizations/${orgId}/me/permissions`,
+    MEMBERS: (orgId) => `/organizations/${orgId}/members`,
+    INVITE: (orgId) => `/organizations/${orgId}/members/invite`,
+    PROJECTS: (orgId) => `/organizations/${orgId}/projects`,
+    PROJECT_DETAIL: (orgId, projectId) => `/organizations/${orgId}/projects/${projectId}`,
+    TASKS: (orgId, projectId) => `/organizations/${orgId}/projects/${projectId}/tasks`,
+    ROLES: (orgId) => `/organizations/${orgId}/roles`,
+    AUDIT_LOGS: (orgId) => `/organizations/${orgId}/audit-logs`,
+  },
+  AUTH_VERIFY_EMAIL: '/auth/verify-email',
+  AUTH_RESEND_VERIFICATION: '/auth/resend-verification',
 };

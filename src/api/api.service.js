@@ -17,6 +17,12 @@ export function syncCsrfFromCookie() {
   }
 }
 
+let unauthorizedListener = null;
+
+export const setUnauthorizedListener = (listener) => {
+  unauthorizedListener = listener;
+};
+
 let refreshPromise = null;
 
 async function refreshAccessToken() {
@@ -28,7 +34,7 @@ async function refreshAccessToken() {
     })
       .then(async (res) => {
         const text = await res.text();
-        let data = {};
+        let data;
         try {
           data = text ? JSON.parse(text) : {};
         } catch {
@@ -45,10 +51,20 @@ async function refreshAccessToken() {
   return refreshPromise;
 }
 
+function getTenantHeaders() {
+  const headers = {};
+  const orgId = localStorage.getItem('currentOrganizationId');
+  const projectId = localStorage.getItem('currentProjectId');
+  if (orgId) headers['X-Organization-Id'] = orgId;
+  if (projectId) headers['X-Project-Id'] = projectId;
+  return headers;
+}
+
 export const fetchAPI = async (endpoint, options = {}, retry = true) => {
   const method = (options.method || 'GET').toUpperCase();
   const headers = {
     'Content-Type': 'application/json',
+    ...getTenantHeaders(),
     ...options.headers,
   };
 
@@ -70,12 +86,20 @@ export const fetchAPI = async (endpoint, options = {}, retry = true) => {
     data = {};
   }
 
-  if (response.status === 401 && retry && !endpoint.includes('/auth/login')) {
-    try {
-      await refreshAccessToken();
-      return fetchAPI(endpoint, options, false);
-    } catch {
-      // fall through to error
+  if (response.status === 401 && !endpoint.includes('/auth/login')) {
+    if (retry) {
+      try {
+        await refreshAccessToken();
+        return fetchAPI(endpoint, options, false);
+      } catch {
+        if (unauthorizedListener) {
+          unauthorizedListener();
+        }
+      }
+    } else {
+      if (unauthorizedListener) {
+        unauthorizedListener();
+      }
     }
   }
 

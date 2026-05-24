@@ -23,6 +23,8 @@ import {
   forgotPassword,
   resetPasswordWithToken,
   listSessions,
+  verifyEmail,
+  resendVerification,
 } from '../controllers/auth.controller.js';
 import {
   setup2fa,
@@ -58,9 +60,17 @@ router.post(
   handleValidationErrors,
   resetPasswordWithToken
 );
+router.post(
+  '/verify-email',
+  authRateLimiter,
+  body('token').notEmpty(),
+  handleValidationErrors,
+  verifyEmail
+);
 
 // Protected
 router.use(authenticate);
+router.post('/resend-verification', authRateLimiter, resendVerification);
 router.post('/logout', csrfProtection, logout);
 router.post('/logout-all', csrfProtection, logoutAll);
 router.get('/sessions', listSessions);

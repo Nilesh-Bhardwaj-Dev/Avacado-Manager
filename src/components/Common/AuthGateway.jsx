@@ -1,5 +1,7 @@
 import { useMemo } from 'react';
 import { useState } from 'react';
+import { Navigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import Login from './Login.jsx';
 import ForgotPassword from './ForgotPassword.jsx';
 import ResetPassword from './ResetPassword.jsx';
@@ -9,6 +11,8 @@ import EnterOtpReset from './EnterOtpReset.jsx';
  * Unauthenticated auth flows: sign in, forgot password, reset via email link.
  */
 export default function AuthGateway() {
+  const user = useSelector((state) => state.auth.user);
+
   const resetTokenFromUrl = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
     return params.get('resetToken') || '';
@@ -16,6 +20,10 @@ export default function AuthGateway() {
 
   const [view, setView] = useState(resetTokenFromUrl ? 'reset' : 'login');
   const [otpEmail, setOtpEmail] = useState('');
+
+  if (user) {
+    return <Navigate to="/" replace />;
+  }
 
   if (view === 'forgot') {
     return (

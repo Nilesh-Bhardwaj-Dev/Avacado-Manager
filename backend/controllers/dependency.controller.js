@@ -3,6 +3,7 @@
  * @description Task dependency management with circular dependency detection via DFS.
  */
 import { getDB } from '../config/db.js';
+import { resolveTaskScope, taskIdQuery } from '../utils/taskScope.util.js';
 
 /**
  * DFS-based cycle detection.
@@ -37,11 +38,11 @@ export async function addDependency(req, res, next) {
     if (!dependsOnId) return res.status(400).json({ error: 'dependsOnId is required' });
     if (taskId === dependsOnId) return res.status(400).json({ error: 'A task cannot depend on itself' });
 
-    const ownerId = req.user.accountRole === 'admin' ? req.user.id : req.user.managedBy;
+    const scope = await resolveTaskScope(req);
 
     // Verify both tasks exist within the same workspace
-    const task = await db.collection('tasks').findOne({ id: taskId, ownerId });
-    const depTask = await db.collection('tasks').findOne({ id: dependsOnId, ownerId });
+    const task = await db.collection('tasks').findOne(taskIdQuery(scope.query, taskId));
+    const depTask = await db.collection('tasks').findOne(taskIdQuery(scope.query, dependsOnId));
     if (!task) return res.status(404).json({ error: 'Task not found' });
     if (!depTask) return res.status(404).json({ error: 'Dependency task not found' });
 
@@ -52,7 +53,7 @@ export async function addDependency(req, res, next) {
     }
 
     // Build dependency graph for cycle detection
-    const allTasks = await db.collection('tasks').find({ ownerId }).toArray();
+    const allTasks = await db.collection('tasks').find(scope.query).toArray();
     const graph = {};
     for (const t of allTasks) {
       graph[t.id] = t.dependencies || [];
@@ -67,7 +68,7 @@ export async function addDependency(req, res, next) {
 
     // Add dependency
     await db.collection('tasks').updateOne(
-      { id: taskId },
+      taskIdQuery(scope.query, taskId),
       { $addToSet: { dependencies: dependsOnId } }
     );
 
@@ -85,10 +86,10 @@ export async function removeDependency(req, res, next) {
     const db = getDB();
     const taskId = req.params.id;
     const depId = req.params.depId;
-    const ownerId = req.user.accountRole === 'admin' ? req.user.id : req.user.managedBy;
+    const scope = await resolveTaskScope(req);
 
     await db.collection('tasks').updateOne(
-      { id: taskId, ownerId },
+      taskIdQuery(scope.query, taskId),
       { $pull: { dependencies: depId } }
     );
 
@@ -106,21 +107,21 @@ export async function getDependencies(req, res, next) {
   try {
     const db = getDB();
     const taskId = req.params.id;
-    const ownerId = req.user.accountRole === 'admin' ? req.user.id : req.user.managedBy;
+    const scope = await resolveTaskScope(req);
 
-    const task = await db.collection('tasks').findOne({ id: taskId, ownerId });
+    const task = await db.collection('tasks').findOne(taskIdQuery(scope.query, taskId));
     if (!task) return res.status(404).json({ error: 'Task not found' });
 
     const deps = task.dependencies || [];
 
     // Get blocking tasks (tasks this task depends on)
     const blockingTasks = deps.length > 0
-      ? await db.collection('tasks').find({ id: { $in: deps }, ownerId }).toArray()
+      ? await db.collection('tasks').find({ ...scope.query, id: { $in: deps } }).toArray()
       : [];
 
     // Get dependent tasks (tasks that depend on this task)
     const dependentTasks = await db.collection('tasks')
-      .find({ dependencies: taskId, ownerId })
+      .find({ ...scope.query, dependencies: taskId })
       .toArray();
 
     // Calculate blocked status

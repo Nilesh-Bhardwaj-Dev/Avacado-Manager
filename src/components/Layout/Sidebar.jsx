@@ -17,12 +17,16 @@ import {
 } from 'lucide-react';
 import { setView, logoutRequest } from '../../store/slices/auth.slice.js';
 import { setUdView } from '../../store/slices/userDashboard.slice.js';
+import { usePermission } from '../../hooks/usePermission.js';
 
 export default function Sidebar() {
   const user = useSelector(state => state.auth.user);
   const activeView = useSelector(state => state.auth.activeView);
   const udView = useSelector(state => state.userDashboard.udView);
   const dispatch = useDispatch();
+
+  const showAuditLogs = usePermission('view_audit_logs');
+  const showTeams = usePermission(['invite_user', 'manage_organization'], { any: true });
 
   if (!user) return null;
 
@@ -50,6 +54,13 @@ export default function Sidebar() {
             style={{ width: '100%', border: 'none', background: 'transparent', textAlign: 'left' }}
           >
             <UserCog size={20} /> Admins
+          </button>
+          <button 
+            className={`nav-item ${activeView === 'organizations' ? 'active' : ''}`} 
+            onClick={() => dispatch(setView('organizations'))}
+            style={{ width: '100%', border: 'none', background: 'transparent', textAlign: 'left' }}
+          >
+            <Shield size={20} /> Organizations
           </button>
           <button 
             className={`nav-item ${activeView === 'users' ? 'active' : ''}`} 
@@ -187,14 +198,16 @@ export default function Sidebar() {
           <CalendarIcon size={20} />
           Calendar
         </button>
-        <button
-          className={`nav-item ${activeView === 'teams' ? 'active' : ''}`}
-          onClick={() => dispatch(setView('teams'))}
-          style={{ width: '100%', border: 'none', background: 'transparent', textAlign: 'left' }}
-        >
-          <Users size={20} />
-          Teams & Members
-        </button>
+        {showTeams && (
+          <button
+            className={`nav-item ${activeView === 'teams' ? 'active' : ''}`}
+            onClick={() => dispatch(setView('teams'))}
+            style={{ width: '100%', border: 'none', background: 'transparent', textAlign: 'left' }}
+          >
+            <Users size={20} />
+            Teams & Members
+          </button>
+        )}
         <button
           className={`nav-item ${activeView === 'profile' ? 'active' : ''}`}
           onClick={() => dispatch(setView('profile'))}
@@ -211,6 +224,16 @@ export default function Sidebar() {
           <MessageCircleQuestion size={20} />
           Raise Query
         </button>
+        {showAuditLogs && (
+          <button
+            className={`nav-item ${activeView === 'audit-logs' ? 'active' : ''}`}
+            onClick={() => dispatch(setView('audit-logs'))}
+            style={{ width: '100%', border: 'none', background: 'transparent', textAlign: 'left' }}
+          >
+            <ScrollText size={20} />
+            Audit Logs
+          </button>
+        )}
       </nav>
       <div className="sidebar-footer">
         <div className="user-profile" onClick={() => dispatch(setView('profile'))} style={{ cursor: 'pointer' }} title="View Profile">

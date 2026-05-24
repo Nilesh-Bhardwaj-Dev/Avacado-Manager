@@ -34,8 +34,9 @@ import { authConfig } from '../config/auth.config.js';
 import { AuditEvent, writeAuditLog } from './audit.service.js';
 import { logActivity } from '../utils/activity.util.js';
 import { consumePasswordResetToken, createPasswordResetToken } from '../utils/passwordReset.util.js';
-import { createOtpLog, verifyOtp } from '../utils/otp.util.js';
+import { verifyOtp } from '../utils/otp.util.js';
 import { sendPasswordChangedEmail, sendPasswordResetLinkEmail } from './email.service.js';
+import { isEmailVerified } from './emailVerification.service.js';
 
 /**
  * @param {string} loginId
@@ -97,6 +98,13 @@ export async function login(credentials, req, res) {
   if (user.status === 'inactive') {
     const err = new Error('Your account has been deactivated.');
     err.status = 403;
+    throw err;
+  }
+
+  if (!isEmailVerified(user)) {
+    const err = new Error('Please verify your email before signing in.');
+    err.status = 403;
+    err.code = 'EMAIL_NOT_VERIFIED';
     throw err;
   }
 
@@ -186,6 +194,13 @@ export async function complete2faLogin(tempToken, totpCode, req, res) {
     throw err;
   }
 
+  if (!isEmailVerified(user)) {
+    const err = new Error('Please verify your email before signing in.');
+    err.status = 403;
+    err.code = 'EMAIL_NOT_VERIFIED';
+    throw err;
+  }
+
   await recordLoginHistory(user, req);
   const userClean = sanitizeUser(user);
   await createSession(userClean, req, res);
@@ -252,7 +267,7 @@ export async function logout(req, res, scope = 'current') {
  * @param {string} email
  * @param {import('express').Request} req
  */
-export async function forgotPassword(email, req) {
+export async function forgotPassword(email) {
   const genericMessage =
     'If an account exists for that email, you will receive reset instructions shortly.';
   const emailLower = String(email).trim().toLowerCase();
@@ -290,7 +305,7 @@ export async function resetPassword(params, req) {
   }
 
   const db = getDB();
-  let userId = null;
+  let userId;
 
   if (email && otp) {
     const record = await verifyOtp(email, otp);

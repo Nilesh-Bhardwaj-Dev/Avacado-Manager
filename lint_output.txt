@@ -1,0 +1,249 @@
+﻿
+> task-management@0.0.0 lint
+> eslint .
+
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\backend\config\socket.js
+  57:14  error  'err' is defined but never used  no-unused-vars
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\backend\controllers\superadmin.controller.js
+   11:10  error  'membershipRepository' is defined but never used  no-unused-vars
+  243:23  error  '_' is assigned a value but never used            no-unused-vars
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\backend\seed\rbac.seed.js
+   19:7   error  'TEAM_LEAD_PERMS' is assigned a value but never used    no-unused-vars
+   25:7   error  'QA_ENGINEER_PERMS' is assigned a value but never used  no-unused-vars
+  132:13  error  'inheritKey' is assigned a value but never used         no-unused-vars
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\backend\services\auth.service.js
+   37:10  error  'createOtpLog' is defined but never used                             no-unused-vars
+  270:45  error  'req' is defined but never used                                      no-unused-vars
+  308:7   error  The value assigned to 'userId' is not used in subsequent statements  no-useless-assignment
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\backend\services\emailVerification.service.js
+  5:16  error  'uuidv4' is defined but never used  no-unused-vars
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\backend\services\twoFactor.service.js
+  15:10  error  'hashBackupCode' is defined but never used  no-unused-vars
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\scratch\check-editor-backups.js
+  41:18  error  'e' is defined but never used  no-unused-vars
+  41:21  error  Empty block statement          no-empty
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\scratch\check-lines-44.js
+  35:14  error  'e' is defined but never used  no-unused-vars
+  35:17  error  Empty block statement          no-empty
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\scratch\check-lines.js
+  39:14  error  'e' is defined but never used  no-unused-vars
+  39:17  error  Empty block statement          no-empty
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\scratch\debug-history.js
+  23:14  error  'e' is defined but never used  no-unused-vars
+  23:17  error  Empty block statement          no-empty
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\scratch\extract-all-appends.js
+  22:14  error  'e' is defined but never used  no-unused-vars
+  22:17  error  Empty block statement          no-empty
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\scratch\extract-all-steps.js
+  31:14  error  'e' is defined but never used  no-unused-vars
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\scratch\find-all-jsx-classes.js
+  38:59  error  Unnecessary escape character: \`  no-useless-escape
+  38:64  error  Unnecessary escape character: \`  no-useless-escape
+  38:69  error  Unnecessary escape character: \`  no-useless-escape
+  42:52  error  Unnecessary escape character: \}  no-useless-escape
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\scratch\find-any-css-backups.js
+  22:12  error  'e' is defined but never used  no-unused-vars
+  22:15  error  Empty block statement          no-empty
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\scratch\find-index-css-in-subagent.js
+  21:13  error  'isIndexCss' is assigned a value but never used  no-unused-vars
+  31:14  error  'e' is defined but never used                    no-unused-vars
+  31:17  error  Empty block statement                            no-empty
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\scratch\find-main-views.js
+  26:14  error  'e' is defined but never used  no-unused-vars
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\scratch\find-matching-history.js
+  47:14  error  'e' is defined but never used  no-unused-vars
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\scratch\find-missing-classes.js
+  32:56  error  Unnecessary escape character: \`  no-useless-escape
+  32:61  error  Unnecessary escape character: \`  no-useless-escape
+  32:66  error  Unnecessary escape character: \`  no-useless-escape
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\scratch\find-subagent-internal-messages.js
+  26:16  error  'e' is defined but never used  no-unused-vars
+  26:19  error  Empty block statement          no-empty
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\scratch\find-subagent-messages.js
+  20:14  error  'e' is defined but never used  no-unused-vars
+  20:17  error  Empty block statement          no-empty
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\scratch\find-tm-history.js
+  48:14  error  'e' is defined but never used  no-unused-vars
+  48:17  error  Empty block statement          no-empty
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\scratch\inspect-css-builder.js
+  28:14  error  'e' is defined but never used  no-unused-vars
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\scratch\inspect-history-folders.js
+  33:14  error  'e' is defined but never used  no-unused-vars
+  33:17  error  Empty block statement          no-empty
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\scratch\inspect-lines-range.js
+  37:14  error  'e' is defined but never used  no-unused-vars
+  37:17  error  Empty block statement          no-empty
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\scratch\inspect-subagent-view.js
+  20:14  error  'e' is defined but never used  no-unused-vars
+  20:17  error  Empty block statement          no-empty
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\scratch\inspect-subagent.js
+  26:14  error  'e' is defined but never used  no-unused-vars
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\scratch\list-all-css-reads.js
+  25:14  error  'e' is defined but never used  no-unused-vars
+  25:17  error  Empty block statement          no-empty
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\scratch\list-all-css-writes.js
+  31:14  error  'e' is defined but never used  no-unused-vars
+  31:17  error  Empty block statement          no-empty
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\scratch\list-css-edits.js
+  28:14  error  'e' is defined but never used  no-unused-vars
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\scratch\print-all-resources.js
+  28:14  error  'e' is defined but never used  no-unused-vars
+  28:17  error  Empty block statement          no-empty
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\scratch\print-css-toolcalls.js
+  26:14  error  'e' is defined but never used  no-unused-vars
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\scratch\print-step-66.js
+  17:14  error  'e' is defined but never used  no-unused-vars
+  17:17  error  Empty block statement          no-empty
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\scratch\print-subagent-steps.js
+  23:14  error  'e' is defined but never used  no-unused-vars
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\scratch\reconstruct-perfect.js
+  40:14  error  'e' is defined but never used  no-unused-vars
+  40:17  error  Empty block statement          no-empty
+  79:14  error  'e' is defined but never used  no-unused-vars
+  79:17  error  Empty block statement          no-empty
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\scratch\recover-by-line.js
+  56:16  error  'e' is defined but never used  no-unused-vars
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\scratch\recover-css.js
+  42:18  error  'e' is defined but never used  no-unused-vars
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\scratch\restore-all-replacements.js
+  12:9   error  The value assigned to 'decoded' is not used in subsequent statements  no-useless-assignment
+  16:16  error  'e' is defined but never used                                         no-unused-vars
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\scratch\scan-44dc9faa.js
+   2:8   error  'path' is defined but never used  no-unused-vars
+  36:14  error  'e' is defined but never used     no-unused-vars
+  36:17  error  Empty block statement             no-empty
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\scratch\scan-all-json.js
+  39:18  error  'e' is defined but never used  no-unused-vars
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\scratch\scan-all-transcripts.js
+  35:14  error  'e' is defined but never used  no-unused-vars
+  35:17  error  Empty block statement          no-empty
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\scratch\search-css-sizes.js
+  22:12  error  'e' is defined but never used  no-unused-vars
+  22:15  error  Empty block statement          no-empty
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\scratch\search-vscode-history.js
+  47:14  error  'e' is defined but never used  no-unused-vars
+  47:17  error  Empty block statement          no-empty
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\scratch\view-raw-log.js
+  19:14  error  'e' is defined but never used  no-unused-vars
+  19:17  error  Empty block statement          no-empty
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\src\api\api.service.js
+  37:13  error  The value assigned to 'data' is not used in subsequent statements  no-useless-assignment
+  94:16  error  'err' is defined but never used                                    no-unused-vars
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\src\components\Common\ProtectedRoute.jsx
+  12:32  error  React Hook "usePermission" is called conditionally. React Hooks must be called in the exact same order in every component render  react-hooks/rules-of-hooks
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\src\components\SuperAdmin\QueriesPanel.jsx
+  69:6  warning  React Hook useEffect has a missing dependency: 'loadData'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\src\components\SuperAdmin\SuperAdminDashboard.jsx
+   22:3   error  'ChevronDown' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                no-unused-vars
+   23:3   error  'ChevronUp' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  no-unused-vars
+  172:61  error  'name' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       no-unused-vars
+  233:61  error  'name' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       no-unused-vars
+  841:20  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+  839 |                     Access Permissions <span style={{ color: 'var(--primary)', fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>ΓÇö what this admin can do</span>
+  840 |                   </p>
+> 841 |                   <PermissionGrid />
+      |                    ^^^^^^^^^^^^^^ This component is created during render
+  842 |                 </div>
+  843 |               </div>
+  844 |               <div className="sa-modal-footer">
+
+  333 |
+  334 |   // ΓöÇΓöÇ Permission Grid Component ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+> 335 |   const PermissionGrid = () => (
+      |                          ^^^^^^^
+> 336 |     <div>
+      | ^^^^^^^^^
+> 337 |       {/* Preset Role Selector */}
+      ΓÇª
+      | ^^^^^^^^^
+> 450 |     </div>
+      | ^^^^^^^^^
+> 451 |   );
+      | ^^^^ The component is created during render here
+  452 |
+  453 |   return (
+  454 |     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>  react-hooks/static-components
+  899:20  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+  897 |                     Access Permissions
+  898 |                   </p>
+> 899 |                   <PermissionGrid />
+      |                    ^^^^^^^^^^^^^^ This component is created during render
+  900 |                 </div>
+  901 |               </div>
+  902 |               <div className="sa-modal-footer">
+
+  333 |
+  334 |   // ΓöÇΓöÇ Permission Grid Component ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+> 335 |   const PermissionGrid = () => (
+      |                          ^^^^^^^
+> 336 |     <div>
+      | ^^^^^^^^^
+> 337 |       {/* Preset Role Selector */}
+      ΓÇª
+      | ^^^^^^^^^
+> 450 |     </div>
+      | ^^^^^^^^^
+> 451 |   );
+      | ^^^^ The component is created during render here
+  452 |
+  453 |   return (
+  454 |     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>                                                                                                                                      react-hooks/static-components
+
+C:\Users\niles\OneDrive\Desktop\Task MAnagement\src\store\slices\context.slice.js
+  65:28  error  'state' is defined but never used  no-unused-vars
+
+Γ£û 92 problems (91 errors, 1 warning)
+

@@ -14,19 +14,23 @@ import 'dotenv/config';
 import http from 'http';
 import app                from './backend/app.js';
 import { connectDB }      from './backend/config/db.js';
-import { seedDatabase }   from './backend/seed/seeder.js';
 import { getDB }          from './backend/config/db.js';
 import { initSocket }     from './backend/config/socket.js';
 import { isCloudinaryConfigured } from './backend/services/cloudinary.service.js';
 import { ensureAuthIndexes } from './backend/models/indexes.js';
+import { connectMongoose } from './backend/config/mongoose.js';
+import { ensureRbacIndexes } from './backend/models/index.js';
+import { seedRbac } from './backend/seed/rbac.seed.js';
 
 const PORT = process.env.PORT || 5000;
 
 async function start() {
   try {
     await connectDB();
+    await connectMongoose();
     await ensureAuthIndexes(getDB());
-    await seedDatabase(getDB());
+    await ensureRbacIndexes();
+    await seedRbac();
 
     const httpServer = http.createServer(app);
     initSocket(httpServer);

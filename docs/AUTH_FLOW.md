@@ -66,4 +66,16 @@ State-changing requests require header `X-CSRF-Token` matching the `csrf_token` 
 | user | Team member |
 | viewer | Read-only |
 
-Use `requireRole()` and `requireMinimumRole()` middleware for route protection.
+Use `requireRole()` for platform routes and `requirePermission()` for tenant APIs.
+
+## Email verification
+
+1. `POST /api/auth/verify-email` with `{ token }` from email link (`/verify-email?token=...`).
+2. `POST /api/auth/resend-verification` (authenticated) resends the link.
+3. When `REQUIRE_EMAIL_VERIFICATION=true`, login returns `403` with `EMAIL_NOT_VERIFIED` until verified.
+
+## Tenant context
+
+Organization and project APIs expect `X-Organization-Id` and `X-Project-Id` headers (or path params). The frontend sets these from the org/project switcher.
+
+See [RBAC.md](./RBAC.md) for the full permission matrix.

@@ -6,6 +6,7 @@
  */
 import { getDB } from '../config/db.js';
 import { logActivity } from '../utils/activity.util.js';
+import { resolveTaskScope, applyTaskScopeFields, taskIdQuery } from '../utils/taskScope.util.js';
 import { sendNotification } from '../utils/notification.util.js';
 import { parseBase64Payload } from '../utils/base64.util.js';
 import { storeAsset } from '../utils/asset-storage.util.js';
@@ -21,9 +22,8 @@ import { storeAsset } from '../utils/asset-storage.util.js';
 export async function getAllTasks(req, res, next) {
   try {
     const db = getDB();
-    const ownerId = req.user.accountRole === 'admin' ? req.user.id : (req.user.accountRole === 'user' ? req.user.managedBy : null);
-    const query = ownerId ? { ownerId } : {};
-    const tasks = await db.collection('tasks').find(query).toArray();
+    const scope = await resolveTaskScope(req);
+    const tasks = await db.collection('tasks').find(scope.query).toArray();
     res.json(tasks);
   } catch (err) {
     next(err);
@@ -45,26 +45,29 @@ export async function createTask(req, res, next) {
     }
 
     const db = getDB();
-    const ownerId = req.user.accountRole === 'admin' ? req.user.id : req.user.managedBy;
+    const scope = await resolveTaskScope(req);
     const id = 'task-' + Date.now();
-    const taskDoc = {
-      id,
-      title,
-      description: description || '',
-      team,
-      assigneeId: assigneeId || null,
-      priority,
-      status,
-      dueDate,
-      createdAt: new Date(),
-      tags: tags || [],
-      subtasks: [],
-      comments: [],
-      dependencies: [],
-      ownerId,
-    };
+    const taskDoc = applyTaskScopeFields(
+      {
+        id,
+        title,
+        description: description || '',
+        team,
+        assigneeId: assigneeId || null,
+        priority,
+        status,
+        dueDate,
+        createdAt: new Date(),
+        tags: tags || [],
+        subtasks: [],
+        comments: [],
+        dependencies: [],
+      },
+      scope
+    );
 
     await db.collection('tasks').insertOne(taskDoc);
+    const ownerId = scope.ownerId;
 
     // Resolve assignee name for activity log
     let assigneeName = 'Unassigned';
@@ -73,7 +76,7 @@ export async function createTask(req, res, next) {
       if (assignee) assigneeName = assignee.name;
     }
 
-    await logActivity(`${req.user.name} created task '${title}' assigned to ${assigneeName}`, ownerId);
+    await logActivity(`${req.user.name} created task '${title}' assigned to ${assigneeName}`, ownerId, scope.organizationId);
 
     // Send notification to assignee if assigned
     if (assigneeId && assigneeId !== req.user.id) {
@@ -103,8 +106,9 @@ export async function updateTask(req, res, next) {
     const { title, description, team, assigneeId, priority, status, dueDate, tags } = req.body;
 
     const db = getDB();
-    const ownerId = req.user.accountRole === 'admin' ? req.user.id : req.user.managedBy;
-    const existing = await db.collection('tasks').findOne({ id, ownerId });
+    const scope = await resolveTaskScope(req);
+    const ownerId = scope.ownerId;
+    const existing = await db.collection('tasks').findOne(taskIdQuery(scope.query, id));
 
     if (!existing) {
       return res.status(404).json({ error: 'Task not found.' });
@@ -129,18 +133,18 @@ export async function updateTask(req, res, next) {
     }
 
     await db.collection('tasks').updateOne(
-      { id, ownerId },
+      taskIdQuery(scope.query, id),
       { $set: { title, description, team, assigneeId, priority, status, dueDate, tags: tags || [] } }
     );
 
-    // Log different messages depending on whether status changed
     if (existing.status !== status) {
       await logActivity(
         `${req.user.name} moved '${title}' from ${existing.status.toUpperCase()} to ${status.toUpperCase()}`,
-        ownerId
+        ownerId,
+        scope.organizationId
       );
     } else {
-      await logActivity(`${req.user.name} updated task '${title}'`, ownerId);
+      await logActivity(`${req.user.name} updated task '${title}'`, ownerId, scope.organizationId);
     }
 
     // Notifications on status change
@@ -158,7 +162,7 @@ export async function updateTask(req, res, next) {
     // When task moves to done, check dependent tasks for unblocking
     if (status === 'done' && existing.status !== 'done') {
       const dependentTasks = await db.collection('tasks')
-        .find({ dependencies: id, ownerId })
+        .find({ ...scope.query, dependencies: id })
         .toArray();
 
       for (const depTask of dependentTasks) {
@@ -207,15 +211,16 @@ export async function deleteTask(req, res, next) {
   try {
     const { id } = req.params;
     const db = getDB();
-    const ownerId = req.user.accountRole === 'admin' ? req.user.id : req.user.managedBy;
+    const scope = await resolveTaskScope(req);
+    const ownerId = scope.ownerId;
 
-    const task = await db.collection('tasks').findOne({ id, ownerId });
+    const task = await db.collection('tasks').findOne(taskIdQuery(scope.query, id));
     if (!task) {
       return res.status(404).json({ error: 'Task not found.' });
     }
 
-    await db.collection('tasks').deleteOne({ id, ownerId });
-    await logActivity(`${req.user.name} deleted task '${task.title}'`, ownerId);
+    await db.collection('tasks').deleteOne(taskIdQuery(scope.query, id));
+    await logActivity(`${req.user.name} deleted task '${task.title}'`, ownerId, scope.organizationId);
 
     res.json({ success: true });
   } catch (err) {
@@ -241,19 +246,20 @@ export async function addSubtask(req, res, next) {
     }
 
     const db = getDB();
-    const ownerId = req.user.accountRole === 'admin' ? req.user.id : req.user.managedBy;
-    const task = await db.collection('tasks').findOne({ id: taskId, ownerId });
+    const scope = await resolveTaskScope(req);
+    const ownerId = scope.ownerId;
+    const task = await db.collection('tasks').findOne(taskIdQuery(scope.query, taskId));
     if (!task) return res.status(404).json({ error: 'Task not found.' });
 
     const id = 'sub-' + Date.now();
     const subtask = { id, title: title.trim(), done: false };
 
     await db.collection('tasks').updateOne(
-      { id: taskId, ownerId },
+      taskIdQuery(scope.query, taskId),
       { $push: { subtasks: subtask } }
     );
 
-    await logActivity(`${req.user.name} added checklist item '${title}' to '${task.title}'`, ownerId);
+    await logActivity(`${req.user.name} added checklist item '${title}' to '${task.title}'`, ownerId, scope.organizationId);
 
     res.status(201).json(subtask);
   } catch (err) {
@@ -271,18 +277,19 @@ export async function updateSubtask(req, res, next) {
     const { done } = req.body;
 
     const db = getDB();
-    const ownerId = req.user.accountRole === 'admin' ? req.user.id : req.user.managedBy;
-    const task = await db.collection('tasks').findOne({ id: taskId, ownerId });
+    const scope = await resolveTaskScope(req);
+    const ownerId = scope.ownerId;
+    const task = await db.collection('tasks').findOne(taskIdQuery(scope.query, taskId));
     if (!task) return res.status(404).json({ error: 'Task not found.' });
 
     await db.collection('tasks').updateOne(
-      { id: taskId, ownerId, 'subtasks.id': id },
+      { ...taskIdQuery(scope.query, taskId), 'subtasks.id': id },
       { $set: { 'subtasks.$.done': done } }
     );
 
     const subtask = task.subtasks.find((s) => s.id === id);
     const action = done ? 'completed' : 'unchecked';
-    await logActivity(`${req.user.name} ${action} subtask '${subtask?.title}' on '${task.title}'`, ownerId);
+    await logActivity(`${req.user.name} ${action} subtask '${subtask?.title}' on '${task.title}'`, ownerId, scope.organizationId);
 
     res.json({ success: true });
   } catch (err) {
@@ -298,12 +305,12 @@ export async function deleteSubtask(req, res, next) {
   try {
     const { taskId, id } = req.params;
     const db = getDB();
-    const ownerId = req.user.accountRole === 'admin' ? req.user.id : req.user.managedBy;
-    const task = await db.collection('tasks').findOne({ id: taskId, ownerId });
+    const scope = await resolveTaskScope(req);
+    const task = await db.collection('tasks').findOne(taskIdQuery(scope.query, taskId));
     if (!task) return res.status(404).json({ error: 'Task not found.' });
 
     await db.collection('tasks').updateOne(
-      { id: taskId, ownerId },
+      taskIdQuery(scope.query, taskId),
       { $pull: { subtasks: { id } } }
     );
 
@@ -331,8 +338,9 @@ export async function addComment(req, res, next) {
     }
 
     const db = getDB();
-    const ownerId = req.user.accountRole === 'admin' ? req.user.id : req.user.managedBy;
-    const task = await db.collection('tasks').findOne({ id: taskId, ownerId });
+    const scope = await resolveTaskScope(req);
+    const ownerId = scope.ownerId;
+    const task = await db.collection('tasks').findOne(taskIdQuery(scope.query, taskId));
     if (!task) return res.status(404).json({ error: 'Task not found.' });
 
     const id = 'c-' + Date.now();
@@ -341,11 +349,11 @@ export async function addComment(req, res, next) {
     const comment = { id, author, content: content.trim(), timestamp };
 
     await db.collection('tasks').updateOne(
-      { id: taskId, ownerId },
+      taskIdQuery(scope.query, taskId),
       { $push: { comments: comment } }
     );
 
-    await logActivity(`${author} commented on task '${task.title}'`, ownerId);
+    await logActivity(`${author} commented on task '${task.title}'`, ownerId, scope.organizationId);
 
     // Notify assignee about new comment (if author is not the assignee)
     if (task.assigneeId && task.assigneeId !== req.user.id) {
@@ -391,8 +399,9 @@ export async function uploadProof(req, res, next) {
     }
 
     const db = getDB();
-    const ownerId = req.user.accountRole === 'admin' ? req.user.id : req.user.managedBy;
-    const task = await db.collection('tasks').findOne({ id: taskId, ownerId });
+    const scope = await resolveTaskScope(req);
+    const ownerId = scope.ownerId;
+    const task = await db.collection('tasks').findOne(taskIdQuery(scope.query, taskId));
     if (!task) return res.status(404).json({ error: 'Task not found.' });
 
     const { buffer, mimeType } = parseBase64Payload(base64, fileType);
@@ -415,11 +424,11 @@ export async function uploadProof(req, res, next) {
     };
 
     await db.collection('tasks').updateOne(
-      { id: taskId, ownerId },
+      taskIdQuery(scope.query, taskId),
       { $push: { proofs: proof } }
     );
 
-    await logActivity(`${req.user.name} uploaded proof '${fileName}' for task '${task.title}'`, ownerId);
+    await logActivity(`${req.user.name} uploaded proof '${fileName}' for task '${task.title}'`, ownerId, scope.organizationId);
 
     // Notify admin
     if (req.user.accountRole === 'user' && req.user.managedBy) {

@@ -177,6 +177,8 @@ export async function listUserSessions(userId) {
  * @returns {object}
  */
 export function sanitizeUser(user) {
+  const isPlatformAdmin =
+    user.accountRole === 'superadmin' || user.accountRole === 'super_admin';
   return {
     id: user.id,
     email: user.email,
@@ -190,6 +192,9 @@ export function sanitizeUser(user) {
     status: user.status || 'active',
     maxUsers: user.maxUsers ?? null,
     managedBy: user.managedBy ?? null,
+    emailVerified: isPlatformAdmin ? true : Boolean(user.emailVerified),
+    defaultOrganizationId: user.defaultOrganizationId ?? null,
+    isPlatformAdmin,
     twoFactorEnabled: Boolean(user.twoFactor?.enabled),
     lastLoginAt: user.lastLoginAt || null,
   };

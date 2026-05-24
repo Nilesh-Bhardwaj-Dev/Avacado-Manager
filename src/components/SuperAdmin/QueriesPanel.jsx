@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   MessageCircleQuestion,
   Clock,
@@ -49,7 +49,7 @@ export default function QueriesPanel() {
   const [updating, setUpdating] = useState(false);
   const [error, setError] = useState('');
 
-  const loadData = () => {
+  const loadData = useCallback(() => {
     setLoading(true);
     const queryParam = filter !== 'all' ? `?status=${filter}` : '';
     Promise.all([
@@ -62,11 +62,11 @@ export default function QueriesPanel() {
       })
       .catch(err => setError(err.message))
       .finally(() => setLoading(false));
-  };
+  }, [filter]);
 
   useEffect(() => {
     loadData();
-  }, [filter]);
+  }, [loadData]);
 
   const handleStatusChange = (queryId, status) => {
     setUpdating(true);

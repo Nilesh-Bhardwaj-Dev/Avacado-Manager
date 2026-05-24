@@ -86,9 +86,9 @@ const authSlice = createSlice({
     sessionFailure(state) {
       state.loading = false;
       state.user = null;
+      state.activeView = 'login';
       localStorage.removeItem('user');
       localStorage.removeItem('token');
-      state.activeView = 'login';
     },
     updateProfileRequest(state) {
       state.loading = true;

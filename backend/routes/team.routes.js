@@ -12,14 +12,26 @@
  */
 import { Router } from 'express';
 import { authenticate } from '../middleware/auth.middleware.js';
+import { optionalTenantContext } from '../middleware/tenant.middleware.js';
+import { requirePermission } from '../middleware/permission.middleware.js';
+import { Permission } from '../constants/permissions.js';
+import { requireRole } from '../middleware/role.middleware.js';
 import { getAllTeams, createTeam, deleteTeam } from '../controllers/team.controller.js';
 
 const router = Router();
 
 router.use(authenticate);
+router.use(optionalTenantContext);
+
+const canManageTeams = (req, res, next) => {
+  if (!req.context?.organizationId) {
+    return requireRole('superadmin', 'admin')(req, res, next);
+  }
+  return requirePermission(Permission.EDIT_PROJECT)(req, res, next);
+};
 
 router.get('/', getAllTeams);
-router.post('/', createTeam);
-router.delete('/:name', deleteTeam);
+router.post('/', canManageTeams, createTeam);
+router.delete('/:name', canManageTeams, deleteTeam);
 
 export default router;
